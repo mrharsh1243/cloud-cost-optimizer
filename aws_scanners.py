@@ -122,3 +122,34 @@ def scan_load_balancers_all_regions():
             })
 
     return all_lbs
+
+def scan_nat_gateways_all_regions():
+    creds = assume_role()
+    all_nats = []
+
+    for region in get_all_regions():
+        ec2 = boto3.client(
+            "ec2",
+            aws_access_key_id=creds["AccessKeyId"],
+            aws_secret_access_key=creds["SecretAccessKey"],
+            aws_session_token=creds["SessionToken"],
+            region_name=region
+        )
+
+        paginator = ec2.get_paginator("describe_nat_gateways")
+
+        for page in paginator.paginate():
+            nat_gateways = page.get("NatGateways", [])
+
+            for nat in nat_gateways:
+                all_nats.append({
+                    "nat_gateway_id": nat["NatGatewayId"],
+                    "state": nat["State"],
+                    "vpc_id": nat["VpcId"],
+                    "subnet_id": nat["SubnetId"],
+                    "region": region
+                })
+
+    return all_nats
+
+

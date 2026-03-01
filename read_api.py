@@ -38,7 +38,7 @@ def get_waste():
     db.close()
 
     # These are the resource sections the UI should ALWAYS show
-    KNOWN_RESOURCES = ["EC2", "EBS", "SNAPSHOT", "EIP","LB"]
+    KNOWN_RESOURCES = ["EC2", "EBS", "SNAPSHOT", "EIP", "LB", "NAT"]
 
     # Human-readable labels for messages
     RESOURCE_LABELS = {
@@ -46,7 +46,8 @@ def get_waste():
         "EBS": "unattached EBS volume",
         "SNAPSHOT": "old snapshot",
         "EIP": "unattached Elastic IP",
-        "LB": "unused load balancer"
+        "LB": "unused load balancer",
+        "NAT": "unused NAT Gateway"
     }
 
     # Group waste by resource type

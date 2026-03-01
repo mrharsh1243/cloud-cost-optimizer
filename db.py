@@ -83,5 +83,18 @@ class LoadBalancer(Base):
     target_count = Column(Integer)
     last_seen = Column(String)
 
+class NatGateway(Base):
+    __tablename__ = "nat_gateways"
+
+    id = Column(Integer, primary_key=True)
+    nat_gateway_id = Column(String)
+    subnet_id = Column(String)
+    vpc_id = Column(String)
+    state = Column(String)
+    region = Column(String)
+    attached_route_tables = Column(Integer)
+    last_seen = Column(String)
+
+
 Base.metadata.create_all(bind=engine)
 

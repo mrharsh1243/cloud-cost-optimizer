@@ -15,6 +15,7 @@ def run_waste_scan():
     detect_snapshot_waste(db)
     detect_eip_waste(db)
     detect_lb_waste(db)
+    detect_nat_waste(db)
 
     db.commit()
     db.close()
@@ -140,6 +141,29 @@ def detect_lb_waste(db):
                     resource_name=lb.lb_name,
                     region=lb.region,
                     reason="Load balancer with no registered targets",
+                    estimated_monthly_savings=0,
+                    detected_at=str(now)
+                )
+            )
+
+# ==================================================
+# NAT RULE (DAY 13)
+# ==================================================
+def detect_nat_waste(db):
+    from db import NatGateway, Waste
+
+    now = datetime.utcnow()
+    nats = db.query(NatGateway).all()
+
+    for nat in nats:
+        if nat.attached_route_tables == 0:
+            db.add(
+                Waste(
+                    resource_type="NAT",
+                    resource_id=nat.nat_gateway_id,
+                    resource_name=f"NAT in {nat.subnet_id}",
+                    region=nat.region,
+                    reason="NAT Gateway not attached to any route table",
                     estimated_monthly_savings=0,
                     detected_at=str(now)
                 )

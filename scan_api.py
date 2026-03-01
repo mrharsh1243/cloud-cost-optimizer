@@ -143,6 +143,34 @@ def scan_load_balancers():
 
     return {"status": "Load balancers scanned and stored"}
 
+@router.post("/scan-nat")
+def scan_nat_gateways():
+    from db import NatGateway
+    from aws_scanners import scan_nat_gateways_all_regions
+
+    db = SessionLocal()
+    db.query(NatGateway).delete()
+
+    nats = scan_nat_gateways_all_regions()
+
+    for nat in nats:
+        db.add(
+            NatGateway(
+                nat_gateway_id=nat["nat_gateway_id"],
+                subnet_id=nat["subnet_id"],
+                vpc_id=nat["vpc_id"],
+                state=nat["state"],
+                region=nat["region"],
+                attached_route_tables=nat["attached_route_tables"],
+                last_seen=str(datetime.utcnow())
+            )
+        )
+
+    db.commit()
+    db.close()
+    return {"status": "NAT gateways scanned and stored"}
+
+
 @router.post("/scan-waste")
 def scan_waste():
     run_waste_scan()
